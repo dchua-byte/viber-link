@@ -1,6 +1,9 @@
 <!doctype html>
-<!-- Viber hand-off page (Cohort-2 Outreach, 2026-10-09). Sheet links point here as viber.html#6281234567890.
-     The number sits after '#', so the browser never sends it to the host; this page stores and sends nothing. -->
+<!-- Viber hand-off page (Cohort-2 Outreach, 2026-10-09). Sheet links point here as
+     viber.html#n=6281234567890&t=<url-encoded message>   (or the older viber.html#6281234567890).
+     Everything after '#' stays in the browser and is never sent to the host; this page stores and sends nothing.
+     Viber's chat link can't pre-fill text, so with a message the button copies it first and you paste it in the chat
+     (copying needs a tap, which is why a link with a message waits for the button instead of opening Viber at once). -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -8,26 +11,55 @@
 <meta name="robots" content="noindex">
 <title>Open in Viber</title>
 <style>
-  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; text-align: center; padding: 48px 16px; }
-  a.btn { display: inline-block; padding: 14px 32px; background: #7360f2; color: #fff; border-radius: 8px;
-          text-decoration: none; font-size: 18px; }
-  p.note { color: #666; font-size: 13px; margin-top: 28px; }
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; text-align: center; padding: 40px 16px; }
+  a.btn, button.btn { display: inline-block; padding: 14px 28px; background: #7360f2; color: #fff; border: 0;
+          border-radius: 8px; text-decoration: none; font-size: 18px; cursor: pointer; }
+  #text { white-space: pre-wrap; text-align: left; max-width: 520px; margin: 0 auto 24px; padding: 14px;
+          background: #f4f3fb; border-radius: 8px; font-size: 15px; line-height: 1.4; }
+  p.note { color: #666; font-size: 13px; margin-top: 24px; }
 </style>
 </head>
 <body>
-<p id="msg" style="font-size:18px;margin-bottom:28px">Opening Viber...</p>
-<a id="btn" class="btn" href="#">Open in Viber</a>
-<p class="note">Opens the chat only. Nothing is sent until you press send.</p>
+<p id="msg" style="font-size:18px;margin-bottom:20px">Opening Viber...</p>
+<div id="text" style="display:none"></div>
+<button id="copy" class="btn" style="display:none">Copy message &amp; open Viber</button>
+<a id="open" class="btn" href="#" style="display:none">Open in Viber</a>
+<p id="hint" class="note">Opens the chat only. Nothing is sent until you press send.</p>
 <script>
-  var n = (location.hash || '').replace(/\D/g, '');
-  var msg = document.getElementById('msg'), btn = document.getElementById('btn');
+  var h = (location.hash || '').slice(1), n = '', t = '';
+  if (h.indexOf('n=') === 0 || h.indexOf('&n=') >= 0) {
+    h.split('&').forEach(function (kv) {
+      var i = kv.indexOf('='), k = kv.slice(0, i), v = kv.slice(i + 1);
+      try { v = decodeURIComponent(v.replace(/\+/g, ' ')); } catch (e) {}
+      if (k === 'n') n = v.replace(/\D/g, '');
+      if (k === 't') t = v;
+    });
+  } else { n = h.replace(/\D/g, ''); }
+  var el = function (id) { return document.getElementById(id); };
   if (n.length < 8 || n.length > 15) {
-    msg.textContent = 'No valid number in this link.'; btn.style.display = 'none';
+    el('msg').textContent = 'No valid number in this link.'; el('hint').style.display = 'none';
   } else {
     var url = 'viber://chat?number=%2B' + n;
-    msg.textContent = 'Chat with +' + n + ' on Viber';
-    btn.href = url;
-    location.href = url;   // tries straight away; the button is the fallback if the browser asks or blocks
+    el('msg').textContent = 'Chat with +' + n + ' on Viber';
+    el('open').href = url;
+    if (t) {
+      el('text').textContent = t; el('text').style.display = 'block';
+      el('copy').style.display = 'inline-block';
+      el('hint').textContent = 'Copies the message, then opens the chat: paste it in and press send.';
+      el('copy').onclick = function () {
+        var go = function () { location.href = url; };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(t).then(go, function () { fallbackCopy(); go(); });
+        } else { fallbackCopy(); go(); }
+      };
+    } else {
+      el('open').style.display = 'inline-block';
+      location.href = url;   // no message to copy, so open straight away; the button is the fallback
+    }
+  }
+  function fallbackCopy() {   // older browsers: copy through a hidden text box
+    var a = document.createElement('textarea'); a.value = t; document.body.appendChild(a);
+    a.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(a);
   }
 </script>
 </body>
