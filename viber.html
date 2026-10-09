@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- Viber hand-off page (Cohort-2 Outreach, 2026-10-09). Sheet links point here as viber.html#6281234567890.
+     The number sits after '#', so the browser never sends it to the host; this page stores and sends nothing. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Open in Viber</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; text-align: center; padding: 48px 16px; }
+  a.btn { display: inline-block; padding: 14px 32px; background: #7360f2; color: #fff; border-radius: 8px;
+          text-decoration: none; font-size: 18px; }
+  p.note { color: #666; font-size: 13px; margin-top: 28px; }
+</style>
+</head>
+<body>
+<p id="msg" style="font-size:18px;margin-bottom:28px">Opening Viber...</p>
+<a id="btn" class="btn" href="#">Open in Viber</a>
+<p class="note">Opens the chat only. Nothing is sent until you press send.</p>
+<script>
+  var n = (location.hash || '').replace(/\D/g, '');
+  var msg = document.getElementById('msg'), btn = document.getElementById('btn');
+  if (n.length < 8 || n.length > 15) {
+    msg.textContent = 'No valid number in this link.'; btn.style.display = 'none';
+  } else {
+    var url = 'viber://chat?number=%2B' + n;
+    msg.textContent = 'Chat with +' + n + ' on Viber';
+    btn.href = url;
+    location.href = url;   // tries straight away; the button is the fallback if the browser asks or blocks
+  }
+</script>
+</body>
+</html>
