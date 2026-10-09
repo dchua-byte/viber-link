@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Viber hand-off page (Cohort-2 Outreach, 2026-10-09). Sheet links point here as
+<!-- Viber hand-off page (Cohort-2 Outreach, 2026-10-09). Sheet links point here as (?n=...&t=... also accepted, for apps that drop the '#')
      viber.html#n=6281234567890&t=<url-encoded message>   (or the older viber.html#6281234567890).
      Everything after '#' stays in the browser and is never sent to the host; this page stores and sends nothing.
      Viber's chat link can't pre-fill text, so with a message the button copies it first and you paste it in the chat
@@ -26,7 +26,7 @@
 <a id="open" class="btn" href="#" style="display:none">Open in Viber</a>
 <p id="hint" class="note">Opens the chat only. Nothing is sent until you press send.</p>
 <script>
-  var h = (location.hash || '').slice(1), n = '', t = '';
+  var h = (location.hash || '').slice(1) || (location.search || '').slice(1), n = '', t = '';
   if (h.indexOf('n=') === 0 || h.indexOf('&n=') >= 0) {
     h.split('&').forEach(function (kv) {
       var i = kv.indexOf('='), k = kv.slice(0, i), v = kv.slice(i + 1);
@@ -37,7 +37,8 @@
   } else { n = h.replace(/\D/g, ''); }
   var el = function (id) { return document.getElementById(id); };
   if (n.length < 8 || n.length > 15) {
-    el('msg').textContent = 'No valid number in this link.'; el('hint').style.display = 'none';
+    el('msg').textContent = 'No valid number in this link.';
+    el('hint').textContent = 'This page received: "' + (location.hash || location.search || '(nothing after the address)') + '"';
   } else {
     var url = 'viber://chat?number=%2B' + n;
     el('msg').textContent = 'Chat with +' + n + ' on Viber';

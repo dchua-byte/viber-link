@@ -18,10 +18,10 @@
 <p id="msg" style="font-size:18px">Viber link test</p>
 <div id="list"></div>
 <script>
-  var n = (location.hash || '').replace(/\D/g, '');
+  var raw = location.hash || location.search || '', n = raw.replace(/\D/g, '');
   var list = document.getElementById('list');
   if (n.length < 8 || n.length > 15) {
-    document.getElementById('msg').textContent = 'No valid number in this link.';
+    document.getElementById('msg').textContent = 'No valid number in this link. This page received: "' + (raw || '(nothing after the address)') + '"';
   } else {
     document.getElementById('msg').textContent = 'Testing +' + n + ': tap each one, then come back here';
     [['A', 'viber://chat?number=%2B' + n, 'chat, number with +'],
